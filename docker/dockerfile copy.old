@@ -1,0 +1,38 @@
+FROM debian:latest
+
+USER root
+
+RUN apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* \
+	&& localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+RUN apt install cron nano -y
+ENV LANG en_US.utf8
+
+USER qlc
+
+WORKDIR /home/qlc
+
+
+# QLC Biuld Instructions
+RUN sudo apt install g++ make cmake git build-essential qtchooser qt5-qmake qtbase5-dev qtbase5-dev-tools qtscript5-dev qtmultimedia5-dev libqt5multimedia5-plugins qttools5-dev-tools qtdeclarative5-dev libqt5svg5-dev qttools5-dev libqt5serialport5-dev fakeroot debhelper devscripts pkg-config libxml2-utils libglib2.0-dev libpulse-dev libxkbcommon-dev
+RUN sudo apt install libasound2-dev libusb-1.0-0-dev libftdi1-dev libudev-dev libmad0-dev libsndfile1-dev libfftw3-dev
+
+RUN git clone --depth 1 --branch QLC+_4.13.1 https://github.com/mcallegari/qlcplus.git
+
+RUN cd qlcplus
+RUN rm ./plugins/CMakeLists.txt
+COPY ./configs/qlc/CMakeLists.txt ./plugins/
+
+RUN mkdir build && cd build
+RUN cmake -DCMAKE_PREFIX_PATH="/usr/lib/x86_64-linux-gnu/cmake/Qt5" ..
+RUN make
+
+USER root
+
+RUN make install
+
+USER qlc
+
+RUN qlcplus
+
+
+EXPOSE 80

@@ -1,0 +1,9 @@
+FROM ubuntu:latest
+
+USER root
+
+RUN apt update
+RUN apt upgrade -y
+
+CMD [ "executable" ]
+

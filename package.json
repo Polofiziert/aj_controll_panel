@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "artnet-node": "github:haakonnessjoen/artnet-node"
+  }
+}
